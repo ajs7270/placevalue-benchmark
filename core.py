@@ -64,6 +64,7 @@ ans = number0 - num_ice_creams_bought_by_joseph
 
 # Passage: {passage}
 # Question : {question}
+{cache}
 """
 
 
