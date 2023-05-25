@@ -1,5 +1,5 @@
 from unittest import TestCase
-from core import convert_and_caching_prob
+from util import convert_and_caching_prob
 from datasets.dataset import Problem
 
 
@@ -97,7 +97,7 @@ class Test(TestCase):
         }
 
         passage, question, cache = convert_and_caching_prob(
-            Problem(passage=case2['Body'], question=case2['Question'], answer=case2['Answer']), inplace=False)
+            Problem(passage=case2['Body'], question=case2['Question'], answer=case2['Answer']), inplace=True)
 
         self.assertEqual(passage,
                          'They decided to hold the party in their backyard. If they have 11(number0) sets of tables and each set has 13(number1) chairs')
@@ -114,7 +114,7 @@ class Test(TestCase):
         }
 
         passage, question, cache = convert_and_caching_prob(
-            Problem(passage=case3['Body'], question=case3['Question'], answer=case3['Answer']), inplace=False)
+            Problem(passage=case3['Body'], question=case3['Question'], answer=case3['Answer']), inplace=True)
 
         self.assertEqual(passage, "In a school there are 458(number0) more girls than boys. If there are 690(number1) girls")
         self.assertEqual(question, "How many pupils are there in that school?")
@@ -130,7 +130,7 @@ class Test(TestCase):
         }
 
         passage, question, cache = convert_and_caching_prob(
-            Problem(passage=case4['Body'], question=case4['Question'], answer=case4['Answer']), inplace=False)
+            Problem(passage=case4['Body'], question=case4['Question'], answer=case4['Answer']), inplace=True)
 
         self.assertEqual(passage, "Kelly has 22(number0) nintendo games.")
         self.assertEqual(question, "How many does she need to buy so that she will have 140(number1) games left?")
