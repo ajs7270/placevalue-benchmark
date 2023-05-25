@@ -1,6 +1,4 @@
 from langchain import PromptTemplate, LLMChain
-import func_timeout
-from collections import defaultdict
 from util import convert_and_caching_prob
 
 
@@ -132,26 +130,7 @@ ans = number0 - num_ice_creams_bought_by_joseph
 """
 
 
-def safe_execute(code_string: str, keys=None):
-    def execute(x):
-        try:
-            exec(x)
-            locals_ = locals()
-            if keys is None:
-                return locals_.get('ans', None)
-            else:
-                return [locals_.get(k, None) for k in keys]
-        except Exception:
-            return None
-    try:
-        ans = func_timeout.func_timeout(5, execute, args=(code_string,))
-    except func_timeout.FunctionTimedOut:
-        ans = None
-
-    return ans
-
-
-def PoT(llm, problem, inplace=False, n=1):
+def PoT(llm, problem, inplace=False):
 
     if not inplace:
         prompt = PromptTemplate(template=PoT_template, input_variables=["passage", "question", "cache"])
@@ -165,24 +144,9 @@ def PoT(llm, problem, inplace=False, n=1):
     print("problem:")
     print(prompt.format(passage=passage, question=question, cache=cache))
 
-    answers = defaultdict(int)
-    for i in range(n):
-        output = llm_chain.run(passage=passage, question=question, cache=cache)
-        output = cache + output
-        print("output:")
-        print(output)
-        ans = safe_execute(output) #TODO should check output
-        if ans:
-            ans = float(ans)
-            answers[ans] += 1
-        print(answers)
+    output = llm_chain.run(passage=passage, question=question, cache=cache)
 
-    if not answers:
-        return None
+    print("output:")
+    print(cache + output)
 
-    ans = sorted(answers.items(), key=lambda x: x[1], reverse=True)[0][0]
-
-    if ans.is_integer():
-        return int(ans)
-
-    return ans
+    return cache, output

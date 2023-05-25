@@ -20,7 +20,9 @@ class Result:
     passage: str
     question: str
     answer: float
+    cache: str
     openai: str
+
 
 def dataclass_to_dict(obj):
     if isinstance(obj, list):
@@ -28,33 +30,31 @@ def dataclass_to_dict(obj):
     elif isinstance(obj, dict):
         return {key: dataclass_to_dict(value) for key, value in obj.items()}
     elif isinstance(obj, Result):
-        return {"passage": obj.passage, "question": obj.question, "answer": obj.answer, "openai": obj.openai}
+        return {"passage": obj.passage, "question": obj.question, "answer": obj.answer,
+                "cache": obj.cache, "openai": obj.openai}
     else:
         return obj
 
-PoT_correct = 0
-outputs = []
-for i, problem in enumerate(svamp):
-    sleep(1)
-    pot_output = PoT(llm=llm, problem=problem)
 
-    if pot_output == problem.answer:
-        PoT_correct += 1
+try:
+    outputs = []
+    for i, problem in enumerate(svamp):
+        sleep(1)
+        pot_cache, pot_output = PoT(llm=llm, problem=problem)
 
-    outputs.append(pot_output)
+        print(f"Question {i+1}---")
+        outputs.append(Result(passage=problem.passage, question=problem.question,
+                              answer=problem.answer, cache=pot_cache, openai=pot_output))
 
-    print(f"current corrects PoT: {PoT_correct}")
-    outputs.append(Result(passage=problem.passage, question=problem.question, answer=problem.answer, openai=pot_output))
+finally:
+    # Convert dataclass objects to dictionaries
+    outputs = dataclass_to_dict(outputs)
 
-# Convert dataclass objects to dictionaries
-outputs = dataclass_to_dict(outputs)
+    # Get current date and time
+    now = datetime.now()
 
-# Get current date and time
-now = datetime.now()
-
-# Save result json
-with open(Path(f"result_{now.strftime('%m%d_%H%M')}.json"), 'w') as f:
-    json.dump({
-        "PoT correct": PoT_correct,
-        "Results": outputs,
-    }, f, indent=4)
+    # Save result json
+    with open(Path(f"result_{now.strftime('%m%d_%H%M')}.json"), 'w') as f:
+        json.dump({
+            "Results": outputs,
+        }, f, indent=4)
