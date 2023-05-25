@@ -1,4 +1,8 @@
+import json
+import numbers
 import re
+
+import func_timeout
 
 
 def convert_and_caching_prob(problem, inplace=False):
@@ -42,3 +46,71 @@ def convert_and_caching_prob(problem, inplace=False):
         cnt += 1
 
     return passage, question, cache
+
+
+def safe_execute(code_string: str):
+    def execute(x):
+        try:
+            exec(x)
+            locals_ = locals()
+
+            r = re.compile("^ans[0-9]*$")
+            ans_candidate = []
+            for key in locals_.keys():
+                if r.match(key):
+                    if len(key) == 3:
+                        ans_candidate.append(0)
+                    else:
+                        ans_candidate.append(int(key[3:]))
+
+            ans_var = 'ans'
+            last_num = sorted(ans_candidate)[-1]
+            if last_num != 0:
+                ans_var += f'{last_num}'
+
+            return locals_[ans_var]
+        except Exception:
+            return None
+    try:
+        ans = func_timeout.func_timeout(5, execute, args=(code_string,))
+    except func_timeout.FunctionTimedOut:
+        ans = None
+
+    return ans
+
+
+def calc_accuracy(filepath):
+    correct_cnt = 0
+    with open(filepath, 'r') as f:
+        results = json.load(f)
+        nan_cnt = 0
+        for i, result in enumerate(results["Results"]):
+            code = result["cache"] + result["openai"]
+
+            ans = safe_execute(code)
+            #print(ans)
+            if isinstance(ans, numbers.Number):
+                ans = float(ans)
+                if ans.is_integer():
+                    ans = int(ans)
+
+                if ans == result["answer"]:
+                    correct_cnt += 1
+                else:
+                    print("--------")
+                    print("Wrong guess:")
+                    print(f"Problem {i}")
+                    print("Code:")
+                    print(code)
+                    print("Answer:")
+                    print(result["answer"])
+                    print("Guess:")
+                    print(ans)
+                    print("--------")
+            else:
+                nan_cnt += 1
+
+    print("Total right count:")
+    print(correct_cnt)
+    print("Total nan count:")
+    print(nan_cnt)
