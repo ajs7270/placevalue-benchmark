@@ -1,6 +1,8 @@
 import json
 from dataclasses import dataclass
 from pathlib import Path
+from time import sleep
+
 from langchain import OpenAI, ConversationChain
 from datetime import datetime
 
@@ -33,8 +35,8 @@ def dataclass_to_dict(obj):
 PoT_correct = 0
 outputs = []
 for i, problem in enumerate(svamp):
-    # pot_output = PoT(llm=llm, problem=problem)
-    pot_output = "test"
+    sleep(1)
+    pot_output = PoT(llm=llm, problem=problem)
 
     if pot_output == problem.answer:
         PoT_correct += 1
@@ -43,7 +45,6 @@ for i, problem in enumerate(svamp):
 
     print(f"current corrects PoT: {PoT_correct}")
     outputs.append(Result(passage=problem.passage, question=problem.question, answer=problem.answer, openai=pot_output))
-    break
 
 # Convert dataclass objects to dictionaries
 outputs = dataclass_to_dict(outputs)
