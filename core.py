@@ -1,7 +1,7 @@
 from langchain import PromptTemplate, LLMChain
 import func_timeout
-import re
 from collections import defaultdict
+from util import convert_and_caching_prob
 
 
 PoT_template = """
@@ -149,13 +149,6 @@ def safe_execute(code_string: str, keys=None):
 
     return ans
 
-def convert_and_caching_prob(problem, inplace=False):
-    passage = ''
-    question = ''
-    cache = ''
-
-
-    return passage, question, cache
 
 def PoT(llm, problem, inplace=False, n=1):
 
@@ -166,35 +159,14 @@ def PoT(llm, problem, inplace=False, n=1):
 
     llm_chain = LLMChain(prompt=prompt, llm=llm)
 
-    passage = problem.passage
-    question = problem.question
-
-    passage_nums = re.finditer(r"\d+\.\d+|\d+", passage)
-    question_nums = re.finditer(r"\d+\.\d+|\d+", question)
-
-    if not inplace:
-        cnt = 0
-        for idx in reversed(passage_nums):
-            passage = passage[:idx.start()] + .replace(num, f'number{cnt}', 1)
-            cnt += 1
-        for num in question_nums:
-            question = question.replace(num, f'number{cnt}', 1)
-            cnt += 1
-    else:
-        cnt = 0
-        for num in passage_nums:
-            passage = passage.replace(num, f'{num}(number{cnt})', 1)
-            cnt += 1
-        for num in question_nums:
-            question = question.replace(num, f'{num}(number{cnt})', 1)
-            cnt += 1
+    passage, question, cache = convert_and_caching_prob(problem, inplace=inplace)
 
     print("problem:")
-    print(prompt.format(passage=passage, question=question))
+    print(prompt.format(passage=passage, question=question, cache=cache))
 
     answers = defaultdict(int)
     for i in range(n):
-        output = llm_chain.run(passage=passage, question=question)
+        output = llm_chain.run(passage=passage, question=question, cache=cache)
         print("output:")
         print(output)
         ans = safe_execute(output) #TODO should check output
