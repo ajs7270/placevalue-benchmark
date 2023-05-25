@@ -168,6 +168,7 @@ def PoT(llm, problem, inplace=False, n=1):
     answers = defaultdict(int)
     for i in range(n):
         output = llm_chain.run(passage=passage, question=question, cache=cache)
+        output = cache + output
         print("output:")
         print(output)
         ans = safe_execute(output) #TODO should check output
