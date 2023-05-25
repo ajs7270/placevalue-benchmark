@@ -127,6 +127,7 @@ ans = number0 - num_ice_creams_bought_by_joseph
 
 # Passage: {passage}
 # Question : {question}
+{cache}
 """
 
 
@@ -148,26 +149,33 @@ def safe_execute(code_string: str, keys=None):
 
     return ans
 
+def convert_and_caching_prob(problem, inplace=False):
+    passage = ''
+    question = ''
+    cache = ''
+
+
+    return passage, question, cache
 
 def PoT(llm, problem, inplace=False, n=1):
 
     if not inplace:
-        prompt = PromptTemplate(template=PoT_template, input_variables=["passage", "question"])
+        prompt = PromptTemplate(template=PoT_template, input_variables=["passage", "question", "cache"])
     else:
-        prompt = PromptTemplate(template=PoT_template_inplace, input_variables=["passage", "question"])
+        prompt = PromptTemplate(template=PoT_template_inplace, input_variables=["passage", "question", "cache"])
 
     llm_chain = LLMChain(prompt=prompt, llm=llm)
 
     passage = problem.passage
     question = problem.question
 
-    passage_nums = re.findall(r"\d+\.\d+|\d+", passage)
-    question_nums = re.findall(r"\d+\.\d+|\d+", question)
+    passage_nums = re.finditer(r"\d+\.\d+|\d+", passage)
+    question_nums = re.finditer(r"\d+\.\d+|\d+", question)
 
     if not inplace:
         cnt = 0
-        for num in passage_nums:
-            passage = passage.replace(num, f'number{cnt}', 1)
+        for idx in reversed(passage_nums):
+            passage = passage[:idx.start()] + .replace(num, f'number{cnt}', 1)
             cnt += 1
         for num in question_nums:
             question = question.replace(num, f'number{cnt}', 1)
