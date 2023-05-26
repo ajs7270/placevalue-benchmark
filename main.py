@@ -7,7 +7,7 @@ from langchain import OpenAI, ConversationChain
 from datetime import datetime
 
 from datasets import Dataset
-from core import PoT
+from core import PoT, PoT_original
 
 # Load SVAMP dataset
 svamp = Dataset(Path("data/SVAMP.json"))
@@ -40,7 +40,7 @@ try:
     outputs = []
     for i, problem in enumerate(svamp):
         sleep(1)
-        pot_cache, pot_output = PoT(llm=llm, problem=problem)
+        pot_cache, pot_output = PoT_original(llm=llm, problem=problem)
 
         print(f"Question {i+1}---")
         outputs.append(Result(passage=problem.passage, question=problem.question,
