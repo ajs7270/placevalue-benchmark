@@ -79,7 +79,7 @@ def safe_execute(code_string: str):
     return ans
 
 
-def calc_accuracy(filepath):
+def PoT_calc_accuracy(filepath):
     correct_cnt = 0
     with open(filepath, 'r') as f:
         results = json.load(f)
@@ -102,6 +102,41 @@ def calc_accuracy(filepath):
                     print(f"Problem {i}")
                     print("Code:")
                     print(code)
+                    print("Answer:")
+                    print(result["answer"])
+                    print("Guess:")
+                    print(ans)
+                    print("--------")
+            else:
+                nan_cnt += 1
+
+    print("Total right count:")
+    print(correct_cnt)
+    print("Total nan count:")
+    print(nan_cnt)
+
+
+def CoT_calc_accuracy(filepath):
+    correct_cnt = 0
+    with open(filepath, 'r') as f:
+        results = json.load(f)
+        nan_cnt = 0
+        for i, result in enumerate(results["Results"]):
+            nums_in_output = re.findall(r"\d+\.\d+|\d+", result["openai"])
+
+            if nums_in_output:
+                ans = float(nums_in_output[-1])
+                if ans.is_integer():
+                    ans = int(ans)
+
+                if ans == result["answer"]:
+                    correct_cnt += 1
+                else:
+                    print("--------")
+                    print("Wrong guess:")
+                    print(f"Problem {i}")
+                    print("Code:")
+                    print(result["openai"])
                     print("Answer:")
                     print(result["answer"])
                     print("Guess:")
