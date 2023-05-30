@@ -48,6 +48,59 @@ def convert_and_caching_prob(problem, inplace=False):
     return passage, question, cache
 
 
+def num_to_words(num):
+    under_20 = ['Zero', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine',
+                'Ten', 'Eleven', 'Twelve', 'Thirteen', 'Fourteen', 'Fifteen', 'Sixteen', 'Seventeen', 'Eighteen',
+                'Nineteen']
+    tens = ['Twenty', 'Thirty', 'Forty', 'Fifty', 'Sixty', 'Seventy', 'Eighty', 'Ninety']
+    above_100 = {100: 'Hundred', 1000: 'Thousand', 1000000: 'Million', 1000000000: 'Billion'}
+
+    if num < 20:
+        return under_20[int(num)]
+
+    if num < 100:
+        return tens[int(num / 10) - 2] + ('' if num % 10 == 0 else ' ' + under_20[int(num) % 10])
+
+    pivot = max([key for key in above_100.keys() if key <= num])
+
+    return num_to_words(int(num / pivot)) + ' ' + above_100[pivot] + (
+        '' if num % pivot == 0 else ' ' + num_to_words(num % pivot))
+
+
+def float_to_words(float_num):
+    if '.' not in str(float_num):
+        return num_to_words(int(float_num))
+
+    integer_part, fractional_part = str(float_num).split('.')
+
+    words = num_to_words(int(integer_part))
+    words += ' point'
+    for digit in fractional_part:
+        words += ' ' + num_to_words(int(digit))
+    return words
+
+
+def convert_digit2alph(problem):
+
+    passage = problem.passage
+    question = problem.question
+
+    passage_idxs = [idx for idx in re.finditer(r"\d+\.\d+|\d+", passage)]
+    question_idxs = [idx for idx in re.finditer(r"\d+\.\d+|\d+", question)]
+
+    for idx in reversed(passage_idxs):
+        num = problem.passage[idx.start(): idx.end()]
+        alph_num = float_to_words(num)
+        passage = passage[:idx.start()] + alph_num + passage[idx.end():]
+
+    for idx in reversed(question_idxs):
+        num = problem.question[idx.start(): idx.end()]
+        alph_num = float_to_words(num)
+        question = question[:idx.start()] + alph_num + question[idx.end():]
+
+    return passage, question
+
+
 def safe_execute(code_string: str):
     def execute(x):
         try:

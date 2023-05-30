@@ -9,7 +9,7 @@ from datetime import datetime
 from langchain.chat_models import ChatOpenAI
 
 from datasets import Dataset
-from core import PoT, PoT_original, CoT_original, CP_rendezvous
+from core import PoT, PoT_original, CoT_original, CP_rendezvous, digit2alph
 
 # Load SVAMP dataset
 svamp = Dataset(Path("data/SVAMP.json"))
@@ -41,12 +41,11 @@ def dataclass_to_dict(obj):
 
 try:
     outputs = []
-    test_name = "CP_rendezvous"
-    cot_filepath = "results/result_cot_original.json"
+    test_name = "digit2alph"
+    #cot_filepath = "results/result_cot_original.json"
     for i, problem in enumerate(svamp):
         sleep(1)
-        pot_cache, pot_output = CP_rendezvous(llm=llm, problem=problem,
-                                              cot_filepath=cot_filepath, i=i)
+        pot_cache, pot_output = digit2alph(llm=llm, problem=problem)
 
         print(f"Question {i+1}---")
         outputs.append(Result(passage=problem.passage, question=problem.question,
