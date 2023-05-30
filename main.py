@@ -6,14 +6,17 @@ from time import sleep
 from langchain import OpenAI, ConversationChain
 from datetime import datetime
 
+from langchain.chat_models import ChatOpenAI
+
 from datasets import Dataset
-from core import PoT, PoT_original, CoT_original
+from core import PoT, PoT_original, CoT_original, CP_rendezvous
 
 # Load SVAMP dataset
 svamp = Dataset(Path("data/SVAMP.json"))
 
 # Load LlamaCpp
-llm = OpenAI(temperature=0.7)
+#llm = OpenAI(temperature=0.7)
+llm = ChatOpenAI(temperature=0.0)
 
 @dataclass
 class Result:
@@ -38,13 +41,18 @@ def dataclass_to_dict(obj):
 
 try:
     outputs = []
+    test_name = "CP_rendezvous"
+    cot_filepath = "results/result_cot_original.json"
     for i, problem in enumerate(svamp):
         sleep(1)
-        pot_cache, pot_output = CoT_original(llm=llm, problem=problem)
+        pot_cache, pot_output = CP_rendezvous(llm=llm, problem=problem,
+                                              cot_filepath=cot_filepath, i=i)
 
         print(f"Question {i+1}---")
         outputs.append(Result(passage=problem.passage, question=problem.question,
                               answer=problem.answer, cache=pot_cache, openai=pot_output))
+
+        break
 
 finally:
     # Convert dataclass objects to dictionaries
@@ -54,7 +62,7 @@ finally:
     now = datetime.now()
 
     # Save result json
-    with open(Path(f"result_{now.strftime('%m%d_%H%M')}.json"), 'w') as f:
+    with open(Path(f"results/{test_name}_{now.strftime('%m%d_%H%M')}.json"), 'w') as f:
         json.dump({
             "Results": outputs,
         }, f, indent=4)
