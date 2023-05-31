@@ -353,3 +353,27 @@ def digit2alph(llm, problem):
     print(output)
 
     return "", output
+
+
+def CP_rendezvous_d2a(llm, problem, cot_filepath, i):
+
+    with open(cot_filepath, 'r') as f:
+        results = json.load(f)
+
+        cot_output = results["Results"][i]["openai"]
+
+    prompt = PromptTemplate(template=PoT_d2a_template, input_variables=["passage", "question"])
+
+    llm_chain = LLMChain(prompt=prompt, llm=llm)
+
+    question = problem.question + '(hint: ' + cot_output + ')'
+
+    print("Question:")
+    print(prompt.format(passage=problem.passage, question=question))
+
+    output = llm_chain.run(passage=problem.passage, question=question)
+
+    print("output:")
+    print(output)
+
+    return "", output
