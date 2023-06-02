@@ -41,7 +41,7 @@ def dataclass_to_dict(obj):
 
 try:
     outputs = []
-    test_name = "PoT_org_scaled_OPENAI"
+    test_name = "PoT_org_scaled_ChatOpenAI"
     #cot_filepath = "results/result_cot_original.json"
     for i, problem in enumerate(svamp):
         sleep(1)
