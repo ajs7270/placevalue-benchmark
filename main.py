@@ -12,11 +12,11 @@ from datasets import Dataset
 from core import PoT, PoT_original, CoT_original, CP_rendezvous, digit2alph, CP_rendezvous_d2a
 
 # Load SVAMP dataset
-svamp = Dataset(Path("data/SVAMP.json"))
+svamp = Dataset(Path("data/SVAMP_scaled.json"))
 
 # Load LlamaCpp
-llm = OpenAI(temperature=0.0)
-#llm = ChatOpenAI(temperature=0.0)
+#llm = OpenAI(temperature=0.0)
+llm = ChatOpenAI(temperature=0.0)
 
 @dataclass
 class Result:
@@ -41,11 +41,11 @@ def dataclass_to_dict(obj):
 
 try:
     outputs = []
-    test_name = "digit2alpha_OPENAI"
+    test_name = "PoT_org_scaled_OPENAI"
     #cot_filepath = "results/result_cot_original.json"
     for i, problem in enumerate(svamp):
         sleep(1)
-        pot_cache, pot_output = digit2alph(llm=llm, problem=problem)
+        pot_cache, pot_output = PoT_original(llm=llm, problem=problem)
 
         print(f"Question {i+1}---")
         outputs.append(Result(passage=problem.passage, question=problem.question,

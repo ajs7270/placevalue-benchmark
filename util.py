@@ -202,3 +202,58 @@ def CoT_calc_accuracy(filepath):
     print(correct_cnt)
     print("Total nan count:")
     print(nan_cnt)
+
+
+def scale_up_nums(target: str, amount):
+
+    idxs = [idx for idx in re.finditer(r"\d+\.\d+|\d+", target)]
+    scaled = target
+
+    for idx in reversed(idxs):
+        num = target[idx.start(): idx.end()]
+        num = float(num)
+
+        if num.is_integer():
+            num = int(num)
+
+        num_scaled = num * amount
+
+        scaled = scaled[:idx.start()] + str(num_scaled) + scaled[idx.end():]
+
+    return scaled
+
+
+def calc_scaled_result(equation: str, amount):
+    idxs = [idx for idx in re.finditer(r"\d+\.\d+|\d+", equation)]
+    scaled = equation
+
+    for idx in reversed(idxs):
+        num = equation[idx.start(): idx.end()]
+        num = float(num)
+
+        if num.is_integer():
+            num = int(num)
+
+        num_scaled = num * amount
+
+        scaled = scaled[:idx.start()] + str(num_scaled) + scaled[idx.end():]
+
+    scaled_result = eval(scaled)
+
+    return scaled_result
+
+
+def scale_up_dataset(filepath, amount=1000):
+    new_data = []
+    with open(filepath, "r") as f:
+        data = json.load(f)
+        for i, problem in enumerate(data):
+            new_data.append(problem)
+            new_data[i]['Body'] = scale_up_nums(new_data[i]['Body'], amount)
+            new_data[i]['Question'] = scale_up_nums(new_data[i]['Question'], amount)
+            new_data[i]['Answer'] = calc_scaled_result(new_data[i]['Equation'], amount)
+
+    with open("data/SVAMP_scaled.json", "w") as f:
+        json.dump(new_data, f, indent=4)
+
+
