@@ -253,7 +253,7 @@ def scale_up_dataset(filepath, amount=1000):
             new_data[i]['Question'] = scale_up_nums(new_data[i]['Question'], amount)
             new_data[i]['Answer'] = calc_scaled_result(new_data[i]['Equation'], amount)
 
-    with open("data/SVAMP_scaled.json", "w") as f:
+    with open(f"data/SVAMP_scaled_{amount}.json", "w") as f:
         json.dump(new_data, f, indent=4)
 
 
