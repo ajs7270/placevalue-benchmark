@@ -373,6 +373,27 @@ def CoT_d2e_selfcon_calc_accuracy(filepath):
     print(correct_cnt)
 
 
+def CoT_d2e_calc_accuracy(filepath):
+    correct_cnt = 0
+
+    with open(filepath, 'r') as f:
+        results = json.load(f)
+        for i, result in enumerate(results["Results"]):
+            answer = float_to_words(result['answer'])
+            if answer in result["openai"]:
+                correct_cnt += 1
+            else:
+                print("--------")
+                print("Wrong guess:")
+                print(f"Problem {i}")
+                print("Answer:")
+                print(result["answer"])
+                print("--------")
+
+    print("Total right count:")
+    print(correct_cnt)
+
+
 def listing_calc_accuracy(filepath):
     correct_cnt = 0
     with open(filepath, 'r') as f:

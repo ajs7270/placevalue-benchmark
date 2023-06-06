@@ -426,14 +426,14 @@ List the following numbers in increasing order
 '''
 
 
-def _compare_single_token(llm):
+def _compare_single_token(llm, n=3):
 
     prompt = PromptTemplate(template=permute_prompt, input_variables=["numbers"])
 
     llm_chain = LLMChain(prompt=prompt, llm=llm)
 
     numbers = ""
-    for i in range(3):
+    for i in range(n):
         num = random.randrange(1, 521)
         numbers += str(num) + '\n'
     print(numbers)
@@ -448,8 +448,10 @@ def _compare_single_token(llm):
 
     nums = re.findall(r"\d+\.\d+|\d+", output)
     result = ""
-    if len(nums) >= 3:
-        result = nums[-3] + " " + nums[-2] + " " + nums[-1]
+    if len(nums) >= n:
+        result = nums[-n]
+        for i in range(1-n, 0):
+            result += " " + nums[i]
 
     return result
 
@@ -460,7 +462,14 @@ def _compare_permutation(llm, sources):
 
     llm_chain = LLMChain(prompt=prompt, llm=llm)
 
-    nums = [n1+n2+n3 for n1, n2, n3 in permutations(sources)]
+    nums = []
+    for elems in permutations(sources):
+        num = ''
+        for elem in elems:
+            num += elem
+        nums.append(num)
+
+    n = len(nums)
 
     numbers = ""
     for num in nums:
@@ -478,9 +487,9 @@ def _compare_permutation(llm, sources):
 
     nums = re.findall(r"\d+\.\d+|\d+", output)
     result = ""
-    if len(nums) >= 6:
-        result = nums[-6]
-        for i in range(-5, 0):
+    if len(nums) >= n:
+        result = nums[-n]
+        for i in range(1-n, 0):
             result += " " + nums[i]
 
     return result

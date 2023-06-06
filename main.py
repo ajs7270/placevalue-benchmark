@@ -76,10 +76,12 @@ def compare_single_token():
 
         for i in range(1000):
             sleep(1)
-            output = _compare_single_token(llm=llm)
+            output = _compare_single_token(llm=llm, n=2)
 
             print(f"Question {i+1}---")
             outputs.append(output)
+
+            break
 
     finally:
         # Get current date and time
@@ -131,6 +133,6 @@ def comparing_numbers(option='single', filepath=""):
 
 
 if __name__ == '__main__':
-    prompting_test()
+    #prompting_test()
     #comparing_numbers(option='permute', filepath='results/compare_one_token_0606_1628.json')
-
+    comparing_numbers(option='single')
