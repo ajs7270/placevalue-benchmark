@@ -1,6 +1,9 @@
 from langchain import PromptTemplate, LLMChain
 from util import convert_and_caching_prob, convert_digit2alph
 import json
+import random
+import re
+from itertools import permutations
 
 PoT_template = """
 Read the following passages to answer questions with Python code, store the result as a 'ans' variable:
@@ -377,3 +380,69 @@ def CP_rendezvous_d2a(llm, problem, cot_filepath, i):
     print(output)
 
     return "", output
+
+
+permute_prompt = '''
+List the following numbers in increasing order
+{numbers}
+'''
+
+
+def _compare_single_token(llm):
+
+    prompt = PromptTemplate(template=permute_prompt, input_variables=["numbers"])
+
+    llm_chain = LLMChain(prompt=prompt, llm=llm)
+
+    numbers = ""
+    for i in range(3):
+        num = random.randrange(1, 521)
+        numbers += str(num) + '\n'
+    print(numbers)
+
+    print("Question:")
+    print(prompt.format(numbers=numbers))
+
+    output = llm_chain.run(numbers=numbers)
+
+    print("output:")
+    print(output)
+
+    nums = re.findall(r"\d+\.\d+|\d+", output)
+    result = ""
+    if len(nums) >= 3:
+        result = nums[-3] + " " + nums[-2] + " " + nums[-1]
+
+    return result
+
+
+def _compare_permutation(llm, sources):
+
+    prompt = PromptTemplate(template=permute_prompt, input_variables=["numbers"])
+
+    llm_chain = LLMChain(prompt=prompt, llm=llm)
+
+    nums = [n1+n2+n3 for n1, n2, n3 in permutations(sources)]
+
+    numbers = ""
+    for num in nums:
+        numbers += num + '\n'
+
+    print(numbers)
+
+    print("Question:")
+    print(prompt.format(numbers=numbers))
+
+    output = llm_chain.run(numbers=numbers)
+
+    print("output:")
+    print(output)
+
+    nums = re.findall(r"\d+\.\d+|\d+", output)
+    result = ""
+    if len(nums) >= 6:
+        result = nums[-6]
+        for i in range(-5, 0):
+            result += " " + nums[i]
+
+    return result

@@ -9,7 +9,8 @@ from datetime import datetime
 from langchain.chat_models import ChatOpenAI
 
 from datasets import Dataset
-from core import PoT, PoT_original, CoT_original, CP_rendezvous, digit2alph, CP_rendezvous_d2a
+from core import PoT, PoT_original, CoT_original, CP_rendezvous, digit2alph, CP_rendezvous_d2a, _compare_single_token, \
+    _compare_permutation
 
 # Load SVAMP dataset
 svamp = Dataset(Path("data/SVAMP_scaled.json"))
@@ -39,29 +40,96 @@ def dataclass_to_dict(obj):
         return obj
 
 
-try:
-    outputs = []
-    test_name = "PoT_org_scaled_ChatOpenAI"
-    #cot_filepath = "results/result_cot_original.json"
-    for i, problem in enumerate(svamp):
-        sleep(1)
-        pot_cache, pot_output = PoT_original(llm=llm, problem=problem)
+def prompting_test():
+    try:
+        outputs = []
+        test_name = "d2a_scaled_ChatOpenAI"
+        #cot_filepath = "results/result_cot_original.json"
+        for i, problem in enumerate(svamp):
+            sleep(1)
+            pot_cache, pot_output = digit2alph(llm=llm, problem=problem)
 
-        print(f"Question {i+1}---")
-        outputs.append(Result(passage=problem.passage, question=problem.question,
-                              answer=problem.answer, cache=pot_cache, openai=pot_output))
+            print(f"Question {i+1}---")
+            outputs.append(Result(passage=problem.passage, question=problem.question,
+                                  answer=problem.answer, cache=pot_cache, openai=pot_output))
 
-        break
+            break
 
-finally:
-    # Convert dataclass objects to dictionaries
-    outputs = dataclass_to_dict(outputs)
+    finally:
+        # Convert dataclass objects to dictionaries
+        outputs = dataclass_to_dict(outputs)
 
-    # Get current date and time
-    now = datetime.now()
+        # Get current date and time
+        now = datetime.now()
 
-    # Save result json
-    with open(Path(f"results/{test_name}_{now.strftime('%m%d_%H%M')}.json"), 'w') as f:
-        json.dump({
-            "Results": outputs,
-        }, f, indent=4)
+        # Save result json
+        with open(Path(f"results/{test_name}_{now.strftime('%m%d_%H%M')}.json"), 'w') as f:
+            json.dump({
+                "Results": outputs,
+            }, f, indent=4)
+
+
+def compare_single_token():
+    try:
+        outputs = []
+        test_name = "compare_one_token"
+
+        for i in range(1000):
+            sleep(1)
+            output = _compare_single_token(llm=llm)
+
+            print(f"Question {i+1}---")
+            outputs.append(output)
+
+    finally:
+        # Get current date and time
+        now = datetime.now()
+
+        # Save result json
+        with open(Path(f"results/{test_name}_{now.strftime('%m%d_%H%M')}.json"), 'w') as f:
+            json.dump({
+                "Results": outputs,
+            }, f, indent=4)
+
+
+def compare_permutation(filepath):
+    try:
+        outputs = []
+        test_name = "compare_permutation"
+
+        with open(filepath, 'r') as f:
+            results = json.load(f)
+
+            for i, result in enumerate(results['Results']):
+                sleep(1)
+                nums = result.split()
+                if nums:
+                    if int(nums[0]) <= int(nums[1]) <= int(nums[2]):
+                        output = _compare_permutation(llm=llm, sources=nums)
+
+                print(f"Question {i + 1}---")
+                outputs.append(output)
+
+                break
+
+    finally:
+        # Get current date and time
+        now = datetime.now()
+
+        # Save result json
+        with open(Path(f"results/{test_name}_{now.strftime('%m%d_%H%M')}.json"), 'w') as f:
+            json.dump({
+                "Results": outputs,
+            }, f, indent=4)
+
+
+def comparing_numbers(option='single', filepath=""):
+    if option == 'single':
+        compare_single_token()
+    else:
+        compare_permutation(filepath)
+
+
+if __name__ == '__main__':
+    comparing_numbers(option='permute', filepath='results/compare_one_token_0606_1628.json')
+
