@@ -3,7 +3,7 @@ import numbers
 import re
 
 import func_timeout
-
+from collections import defaultdict
 
 def convert_and_caching_prob(problem, inplace=False):
 
@@ -257,3 +257,142 @@ def scale_up_dataset(filepath, amount=1000):
         json.dump(new_data, f, indent=4)
 
 
+def PoT_selfcon_calc_accuracy(filepath):
+    correct_cnt = 0
+
+    answers = [[] for i in range(1000)]
+
+    for j in range(1, 6):
+        with open(filepath.format(j), 'r') as f:
+            results = json.load(f)
+            for i, result in enumerate(results["Results"]):
+                code = result["cache"] + result["openai"]
+
+                ans = safe_execute(code)
+
+                if isinstance(ans, numbers.Number):
+                    ans = float(ans)
+                    if ans.is_integer():
+                        ans = int(ans)
+                    answers[i].append(ans)
+
+                if j == 5:
+                    candidates = defaultdict(int)
+                    for ans in answers[i]:
+                        candidates[ans] += 1
+
+                    if candidates:
+                        ans = sorted(candidates.items(), key=lambda x: x[1], reverse=True)[0][0]
+                    else:
+                        ans = 9999
+
+                    if ans == result["answer"]:
+                        correct_cnt += 1
+                    else:
+                        print("--------")
+                        print("Wrong guess:")
+                        print(f"Problem {i}")
+                        print("Answer:")
+                        print(result["answer"])
+                        print("Guess:")
+                        print(ans)
+                        print("--------")
+
+    print("Total right count:")
+    print(correct_cnt)
+
+
+def CoT_selfcon_calc_accuracy(filepath):
+    correct_cnt = 0
+
+    answers = [[] for i in range(1000)]
+
+    for j in range(1, 6):
+        with open(filepath.format(j), 'r') as f:
+            results = json.load(f)
+            for i, result in enumerate(results["Results"]):
+                nums_in_output = re.findall(r"\d+\.\d+|\d+", result["openai"])
+
+                if nums_in_output:
+                    ans = float(nums_in_output[-1])
+                    if ans.is_integer():
+                        ans = int(ans)
+                    answers[i].append(ans)
+
+                if j == 5:
+                    candidates = defaultdict(int)
+                    for ans in answers[i]:
+                        candidates[ans] += 1
+
+                    if candidates:
+                        ans = sorted(candidates.items(), key=lambda x: x[1], reverse=True)[0][0]
+                    else:
+                        ans = 9999
+
+                    if ans == result["answer"]:
+                        correct_cnt += 1
+                    else:
+                        print("--------")
+                        print("Wrong guess:")
+                        print(f"Problem {i}")
+                        print("Answer:")
+                        print(result["answer"])
+                        print("Guess:")
+                        print(ans)
+                        print("--------")
+
+    print("Total right count:")
+    print(correct_cnt)
+
+
+def CoT_d2e_selfcon_calc_accuracy(filepath):
+    correct_cnt = 0
+
+    corrects = [0 for _ in range(1000)]
+
+    for j in range(1, 6):
+        with open(filepath.format(j), 'r') as f:
+            results = json.load(f)
+            for i, result in enumerate(results["Results"]):
+                answer = float_to_words(result['answer'])
+                if answer in result["openai"]:
+                    corrects[i] += 1
+
+                if j == 5:
+                    if corrects[i] >= 3:
+                        correct_cnt += 1
+                    else:
+                        print("--------")
+                        print("Wrong guess:")
+                        print(f"Problem {i}")
+                        print("Answer:")
+                        print(result["answer"])
+                        print("--------")
+
+    print("Total right count:")
+    print(correct_cnt)
+
+
+def listing_calc_accuracy(filepath):
+    correct_cnt = 0
+    with open(filepath, 'r') as f:
+        answers = json.load(f)
+        print("answer count:")
+        print(len(answers['Results']))
+        for answer in answers['Results']:
+            ans = answer.split()
+
+            buf = 0
+            wrong = False
+            for num in ans:
+                n = int(num)
+                if buf > n:
+                    wrong = True
+                    break
+                buf = n
+
+            if not wrong:
+                correct_cnt += 1
+
+    print("Total right count:")
+    print(correct_cnt)
