@@ -259,6 +259,25 @@ A: Olivia had 23 dollars. 5 bagels for 3 dollars each will be 5 x 3 = 15 dollars
 Q: {question}
 """
 
+CoT_d2e_template = '''Q: There are Fifteen trees in the grove. Grove workers will plant trees in the grove today. After they are done, there will be Twenty One trees. How many trees did the grove workers plant today?
+A: There are Fifteen trees originally. Then there were Twenty One trees after some more were planted. So there must have been Twenty One - Fifteen = Six. The answer is Six.
+Q: If there are Three cars in the parking lot and Two more cars arrive, how many cars are in the parking lot?
+A: There are originally Three cars. Two more cars arrive. Three + Two = Five. The answer is Five.
+Q: Leah had Thirty Two chocolates and her sister had Forty Two. If they ate Thirty Five, how many pieces do they have left in total?
+A: Originally, Leah had Thirty Two chocolates. Her sister had Forty Two. So in total they had Thirty Two + Forty Two = Seventy Four. After eating Thirty Five, they had Seventy Four - Thirty Five = Thirty Nine. The answer is Thirty Nine.
+Q: Jason had Twenty lollipops. He gave Denny some lollipops. Now Jason has Twelve lollipops. How many lollipops did Jason give to Denny?
+A: Jason started with Twenty lollipops. Then he had Twelve after giving some to Denny. So he gave Denny Twenty - Twelve = Eight. The answer is Eight.
+Q: Shawn has five toys. For Christmas, he got two toys each from his mom and dad. How many toys does he have now?
+A: Shawn started with Five toys. If he got Two toys each from his mom and dad, then that is Four more toys. Five + Four = Nine. The answer is Nine.
+Q: There were nine computers in the server room. Five more computers were installed each day, from monday to thursday. How many computers are now in the server room?
+A: There were originally Nine computers. For each of Four days, Five more computers were added. So Five * Four = Twenty computers were added. Nine + Twenty is Twenty Nine. The answer is Twenty Nine.
+Q: Michael had Fifty Eight golf balls. On tuesday, he lost Twenty Three golf balls. On wednesday, he lost Two more. How many golf balls did he have at the end of wednesday?
+A: Michael started with Fifty Eight golf balls. After losing Twenty Three on tuesday, he had Fifty Eight - Twenty Three = Thirty Five. After losing Two more, he had Thirty Five - Two = Thirty Three golf balls. The answer is Thirty Three.
+Q: Olivia has $Twenty Three. She bought five bagels for $Three each. How much money does she have left?
+A: Olivia had Twenty Three dollars. Five bagels for Three dollars each will be Five x Three = Fifteen dollars. So she has Twenty Three - Fifteen dollars left. Twenty Three - Fifteen is Eight. The answer is Eight.
+Q: {question}
+'''
+
 def PoT(llm, problem, inplace=False):
 
     if not inplace:
@@ -351,6 +370,25 @@ def digit2alph(llm, problem):
     print(prompt.format(passage=passage, question=question))
 
     output = llm_chain.run(passage=passage, question=question)
+
+    print("output:")
+    print(output)
+
+    return "", output
+
+
+def digit2alph_CoT(llm, problem):
+
+    prompt = PromptTemplate(template=CoT_d2e_template, input_variables=["question"])
+
+    llm_chain = LLMChain(prompt=prompt, llm=llm)
+
+    passage, question = convert_digit2alph(problem)
+
+    print("question:")
+    print(prompt.format(question=passage + ' ' + question))
+
+    output = llm_chain.run(question=passage + ' ' + question)
 
     print("output:")
     print(output)

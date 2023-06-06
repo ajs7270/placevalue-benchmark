@@ -10,10 +10,10 @@ from langchain.chat_models import ChatOpenAI
 
 from datasets import Dataset
 from core import PoT, PoT_original, CoT_original, CP_rendezvous, digit2alph, CP_rendezvous_d2a, _compare_single_token, \
-    _compare_permutation
+    _compare_permutation, digit2alph_CoT
 
 # Load SVAMP dataset
-svamp = Dataset(Path("data/SVAMP_scaled.json"))
+svamp = Dataset(Path("data/SVAMP.json"))
 
 # Load LlamaCpp
 #llm = OpenAI(temperature=0.0)
@@ -43,11 +43,11 @@ def dataclass_to_dict(obj):
 def prompting_test():
     try:
         outputs = []
-        test_name = "d2a_scaled_ChatOpenAI"
+        test_name = "d2e_CoT_ChatOpenAI"
         #cot_filepath = "results/result_cot_original.json"
         for i, problem in enumerate(svamp):
             sleep(1)
-            pot_cache, pot_output = digit2alph(llm=llm, problem=problem)
+            pot_cache, pot_output = digit2alph_CoT(llm=llm, problem=problem)
 
             print(f"Question {i+1}---")
             outputs.append(Result(passage=problem.passage, question=problem.question,
@@ -131,5 +131,6 @@ def comparing_numbers(option='single', filepath=""):
 
 
 if __name__ == '__main__':
-    comparing_numbers(option='permute', filepath='results/compare_one_token_0606_1628.json')
+    prompting_test()
+    #comparing_numbers(option='permute', filepath='results/compare_one_token_0606_1628.json')
 
