@@ -97,7 +97,7 @@ def compare_single_token():
 def compare_permutation(filepath):
     try:
         outputs = []
-        test_name = "compare_permutation"
+        test_name = "compare_permutation_2"
 
         with open(filepath, 'r') as f:
             results = json.load(f)
@@ -105,8 +105,15 @@ def compare_permutation(filepath):
             for i, result in enumerate(results['Results']):
                 sleep(1)
                 nums = result.split()
+
                 if nums:
-                    if int(nums[0]) <= int(nums[1]) <= int(nums[2]):
+                    wrong = False
+                    buf = -1
+                    for num in nums:
+                        if buf > int(num):
+                            wrong = True
+                            break
+                    if not wrong:
                         output = _compare_permutation(llm=llm, sources=nums)
 
                 print(f"Question {i + 1}---")
@@ -134,5 +141,5 @@ def comparing_numbers(option='single', filepath=""):
 
 if __name__ == '__main__':
     #prompting_test()
-    #comparing_numbers(option='permute', filepath='results/compare_one_token_0606_1628.json')
-    comparing_numbers(option='single')
+    comparing_numbers(option='permute', filepath='results/compare_one_token_2_0606_2143.json')
+    #comparing_numbers(option='single')
