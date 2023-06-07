@@ -462,7 +462,6 @@ def _compare_permutation(llm, sources):
 
     llm_chain = LLMChain(prompt=prompt, llm=llm)
 
-    random.shuffle(sources)
     nums = []
     for elems in permutations(sources):
         num = ''
@@ -470,7 +469,9 @@ def _compare_permutation(llm, sources):
             num += elem
         nums.append(num)
 
-    n = len(nums)
+    random.shuffle(nums)
+    nums = nums[:6]
+    n = 6
 
     numbers = ""
     for num in nums:
