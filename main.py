@@ -141,5 +141,5 @@ def comparing_numbers(option='single', filepath=""):
 
 if __name__ == '__main__':
     #prompting_test()
-    comparing_numbers(option='permute', filepath='results/compare_one_token_2_0606_2143.json')
-    #comparing_numbers(option='single')
+    #comparing_numbers(option='permute', filepath='results/compare_one_token_2_0606_2143.json')
+    comparing_numbers(option='single')

@@ -434,7 +434,7 @@ def _compare_single_token(llm, n=3):
 
     numbers = ""
     for i in range(n):
-        num = random.randrange(1, 521)
+        num = random.randrange(100, 521)
         numbers += str(num) + '\n'
     print(numbers)
 
