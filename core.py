@@ -260,21 +260,21 @@ Q: {question}
 """
 
 CoT_d2e_template = '''Q: There are Fifteen trees in the grove. Grove workers will plant trees in the grove today. After they are done, there will be Twenty One trees. How many trees did the grove workers plant today?
-A: There are Fifteen trees originally. Then there were Twenty One trees after some more were planted. So there must have been Twenty One - Fifteen = Six. The answer is Six.
+A: There are 15 trees originally. Then there were 21 trees after some more were planted. So there must have been 21 - 15 = 6. The answer is 6.
 Q: If there are Three cars in the parking lot and Two more cars arrive, how many cars are in the parking lot?
-A: There are originally Three cars. Two more cars arrive. Three + Two = Five. The answer is Five.
+A: There are originally 3 cars. 2 more cars arrive. 3 + 2 = 5. The answer is 5.
 Q: Leah had Thirty Two chocolates and her sister had Forty Two. If they ate Thirty Five, how many pieces do they have left in total?
-A: Originally, Leah had Thirty Two chocolates. Her sister had Forty Two. So in total they had Thirty Two + Forty Two = Seventy Four. After eating Thirty Five, they had Seventy Four - Thirty Five = Thirty Nine. The answer is Thirty Nine.
+A: Originally, Leah had 32 chocolates. Her sister had 42. So in total they had 32 + 42 = 74. After eating 35, they had 74 - 35 = 39. The answer is 39.
 Q: Jason had Twenty lollipops. He gave Denny some lollipops. Now Jason has Twelve lollipops. How many lollipops did Jason give to Denny?
-A: Jason started with Twenty lollipops. Then he had Twelve after giving some to Denny. So he gave Denny Twenty - Twelve = Eight. The answer is Eight.
+A: Jason started with 20 lollipops. Then he had 12 after giving some to Denny. So he gave Denny 20 - 12 = 8. The answer is 8.
 Q: Shawn has five toys. For Christmas, he got two toys each from his mom and dad. How many toys does he have now?
-A: Shawn started with Five toys. If he got Two toys each from his mom and dad, then that is Four more toys. Five + Four = Nine. The answer is Nine.
+A: Shawn started with 5 toys. If he got 2 toys each from his mom and dad, then that is 4 more toys. 5 + 4 = 9. The answer is 9.
 Q: There were nine computers in the server room. Five more computers were installed each day, from monday to thursday. How many computers are now in the server room?
-A: There were originally Nine computers. For each of Four days, Five more computers were added. So Five * Four = Twenty computers were added. Nine + Twenty is Twenty Nine. The answer is Twenty Nine.
+A: There were originally 9 computers. For each of 4 days, 5 more computers were added. So 5 * 4 = 20 computers were added. 9 + 20 is 29. The answer is 29.
 Q: Michael had Fifty Eight golf balls. On tuesday, he lost Twenty Three golf balls. On wednesday, he lost Two more. How many golf balls did he have at the end of wednesday?
-A: Michael started with Fifty Eight golf balls. After losing Twenty Three on tuesday, he had Fifty Eight - Twenty Three = Thirty Five. After losing Two more, he had Thirty Five - Two = Thirty Three golf balls. The answer is Thirty Three.
+A: Michael started with 58 golf balls. After losing 23 on tuesday, he had 58 - 23 = 35. After losing Two more, he had 35 - 2 = 33 golf balls. The answer is 33.
 Q: Olivia has $Twenty Three. She bought five bagels for $Three each. How much money does she have left?
-A: Olivia had Twenty Three dollars. Five bagels for Three dollars each will be Five x Three = Fifteen dollars. So she has Twenty Three - Fifteen dollars left. Twenty Three - Fifteen is Eight. The answer is Eight.
+A: Olivia had 23 dollars. 5 bagels for 3 dollars each will be 5 x 3 = 15 dollars. So she has 23 - 15 dollars left. 23 - 15 is 8. The answer is 8.
 Q: {question}
 '''
 

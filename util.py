@@ -257,6 +257,41 @@ def scale_up_dataset(filepath, amount=1000):
         json.dump(new_data, f, indent=4)
 
 
+def print_dataset_numbers():
+    filepath = 'data/SVAMP'
+    for num in [1, 137, 1000, 1123, 16383]:
+        if num == 1:
+            fp = filepath + '.json'
+        else:
+            fp = filepath + f'_scaled_{num}.json'
+        with open(fp, "r") as f:
+            data = json.load(f)
+            new_data = []
+            for i, problem in enumerate(data):
+                n = re.findall(r"\d+\.\d+|\d+", problem['Body'])
+                new_data += n
+                n = re.findall(r"\d+\.\d+|\d+", problem['Question'])
+                new_data += n
+
+        with open(f"data/numbers_{num}.txt", "w") as f:
+            for n in new_data:
+                f.write(n + '\n')
+
+def print_dataset_d2e():
+    filepath = 'data/numbers'
+    for num in [1, 137, 1000, 1123, 16383]:
+        fp = filepath + f'_{num}.txt'
+        with open(fp, "r") as f:
+            lines = f.readlines()
+            new_data = []
+            for line in lines:
+                new_data.append(float_to_words(int(line.strip())))
+
+        with open(f"data/d2e_{num}.txt", "w") as f:
+            for n in new_data:
+                f.write(n + '\n')
+
+
 def PoT_selfcon_calc_accuracy(filepath):
     correct_cnt = 0
 
