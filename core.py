@@ -1,5 +1,5 @@
 from langchain import PromptTemplate, LLMChain
-from util import convert_and_caching_prob, convert_digit2alph
+from util import convert_and_caching_prob, convert_digit2alph, float_to_words
 import json
 import random
 import re
@@ -184,6 +184,192 @@ ans = total_ice_creams - num_ice_creams_bought_by_joseph
 
 # Passage: {passage}
 # Question : {question}
+"""
+
+d2e_num_eng_template = """
+Read the following passages to answer questions with Python code, store the result as a 'ans' variable:
+
+# Passage: James bought Ninety Three red and Ten blue stickers, he used Thirty One red sticker on his fridge and Seven blue stickers on his laptop.
+# Question: How many red stickers does James have?
+# Hint:
+Ninety Three = 93
+Ten = 10
+Thirty One = 31
+Seven = 7
+# Python:
+original_red_stickers = 93
+used_red_stickers = 31
+ans = original_red_stickers - used_red_stickers
+
+# Passage: Allen went to supermarket to buy eggs, each egg costs Eighty dollars, if the discount is Twenty Nine dollars.
+# Question: How much do you have to pay to buy for each egg?
+# Hint:
+Eighty = 80
+Twenty Nine = 29
+# Python:
+original_egg_price_in_dollars = 80
+discount_dollars = 29
+ans = original_egg_price_in_dollars - discount_dollars
+
+# Passage: Dianna collects both cases and books. He bought Twenty Two cases and Five books from the store. Now he has Fifty Seven cases and Twenty Five books.
+# Question: How many books did danny have at first?
+# Hint:
+Twenty Two = 22
+Five = 5
+Fifty Seven = 57
+Twenty Five = 25
+# Python:
+num_books_bought_at_store = 5
+num_books_now = 25
+ans = num_books_now - num_books_bought_at_store
+
+# Passage: There were One Hundred Eight chickens and Twenty sheeps at the farm, some of chickens and sheeps were sold. There are Eighty Seven chickens and Eighteen sheeps left now.
+# Question: How many chickens were sold?
+# Hint:
+One Hundred Eight = 108
+Twenty = 20
+Eighty Seven = 87
+Eighteen = 18
+# Python:
+num_chicken_before = 108
+num_chicken_now = 87
+ans = num_chicken_before - num_chicken_now
+
+# Passage: Katty scored Two goals on monday, Eight goals on tuesday and Nine goals on wednesday.
+# Question: How many did Katty score on monday and wednesday?
+# Hint:
+Two = 2
+Eight = 8
+Nine = 9
+# Python:
+num_goals_on_monday = 2
+num_goals_on_wednesday = 9
+ans = num_goals_on_monday + num_goals_on_wednesday
+
+# Passage: There are Five girls and Four boys in the Masquerade, Twelve more girls and Seven more boys joined. 
+# Question: How many more girls than boys are in the Masquerade?
+# Hint:
+Five = 5
+Four = 4
+Twelve = 12
+Seven = 7
+# Python:
+num_girls_before = 5
+num_girls_joined = 12
+num_boys_before = 4
+num_boys_joined = 7
+total_girls = num_girls_before + num_girls_joined
+total_boys = num_boys_before + num_boys_joined
+ans = total_girls - total_boys
+
+# Passage: Joseph and Getty went to buy ice creams, they together bought Thirty Six ice creams. On the way back, Joseph ate Twelve of the ice creams, and he has Two ice creams left now. 
+# Question: How much ice cream did Getty purchase?
+# Hint:
+Thirty Six = 36
+Twelve = 12
+Two = 2
+# Python:
+num_ice_creams_bought_by_joseph = 2 + 12
+total_ice_creams = 36
+ans = total_ice_creams - num_ice_creams_bought_by_joseph
+
+# Passage: {passage}
+# Question : {question}
+# Hint:
+{hint}# Python:
+"""
+
+PoT_num_eng_template = """
+Read the following passages to answer questions with Python code, store the result as a 'ans' variable:
+
+# Passage: James bought 93 red and 10 blue stickers, he used 31 red sticker on his fridge and 7 blue stickers on his laptop.
+# Question: How many red stickers does James have?
+# Hint:
+93 = Ninety Three
+10 = Ten
+31 = Thirty One
+7 = Seven
+# Python:
+original_red_stickers = 93
+used_red_stickers = 31
+ans = original_red_stickers - used_red_stickers
+
+# Passage: Allen went to supermarket to buy eggs, each egg costs 80 dollars, if the discount is 29 dollars.
+# Question: How much do you have to pay to buy for each egg?
+# Hint:
+80 = Eighty
+29 = Twenty Nine
+# Python:
+original_egg_price_in_dollars = 80
+discount_dollars = 29
+ans = original_egg_price_in_dollars - discount_dollars
+
+# Passage: Dianna collects both cases and books. He bought 22 cases and 5 books from the store. Now he has 57 cases and 25 books.
+# Question: How many books did danny have at first?
+# Hint:
+22 = Twenty Two
+5 = Five
+57 = Fifty Seven
+25 = Twenty Five
+# Python:
+num_books_bought_at_store = 5
+num_books_now = 25
+ans = num_books_now - num_books_bought_at_store
+
+# Passage: There were 108 chickens and 20 sheeps at the farm, some of chickens and sheeps were sold. There are 87 chickens and 18 sheeps left now.
+# Question: How many chickens were sold?
+# Hint:
+108 = One Hundred Eight
+20 = Twenty
+87 = Eighty Seven
+18 = Eighteen
+# Python:
+num_chicken_before = 108
+num_chicken_now = 87
+ans = num_chicken_before - num_chicken_now
+
+# Passage: Katty scored 2 goals on monday, 8 goals on tuesday and 9 goals on wednesday.
+# Question: How many did Katty score on monday and wednesday?
+# Hint:
+2 = Two
+8 = Eight
+9 = Nine
+# Python:
+num_goals_on_monday = 2
+num_goals_on_wednesday = 9
+ans = num_goals_on_monday + num_goals_on_wednesday
+
+# Passage: There are 5 girls and 4 boys in the Masquerade, 12 more girls and 7 more boys joined. 
+# Question: How many more girls than boys are in the Masquerade?
+# Hint:
+5 = Five
+4 = Four
+12 = Twelve
+7 = Seven
+# Python:
+num_girls_before = 5
+num_girls_joined = 12
+num_boys_before = 4
+num_boys_joined = 7
+total_girls = num_girls_before + num_girls_joined
+total_boys = num_boys_before + num_boys_joined
+ans = total_girls - total_boys
+
+# Passage: Joseph and Getty went to buy ice creams, they together bought 36 ice creams. On the way back, Joseph ate 12 of the ice creasm, and he has 2 ice creams left now. 
+# Question: How much ice cream did Getty purchase?
+# Hint:
+36 = Thirty Six
+12 = Twelve
+2 = Two
+# Python:
+num_ice_creams_bought_by_joseph = 2 + 12
+total_ice_creams = 36
+ans = total_ice_creams - num_ice_creams_bought_by_joseph
+
+# Passage: {passage}
+# Question : {question}
+# Hint:
+{hint}# Python:
 """
 
 
@@ -613,6 +799,53 @@ def professor_comment(llm, problem):
     print(prompt.format(passage=problem.passage, question=problem.question, hint=get_hint(problem.passage + ' ' + problem.question)))
 
     output = llm_chain.run(passage=problem.passage, question=problem.question, hint=get_hint(problem.passage + ' ' + problem.question))
+
+    print("output:")
+    print(output)
+
+    return "", output
+
+
+def d2e_num_eng_matching(llm, problem):
+
+    prompt = PromptTemplate(template=d2e_num_eng_template, input_variables=["passage", "question", "hint"])
+
+    llm_chain = LLMChain(prompt=prompt, llm=llm)
+
+    nums = re.findall(r"\d+\.\d+|\d+", problem.passage + ' ' + problem.question)
+
+    hint = ""
+    for n in nums:
+        hint += float_to_words(n) + ' = ' + n + '\n'
+
+    passage, question = convert_digit2alph(problem)
+
+    print("question:")
+    print(prompt.format(passage=passage, question=question, hint=hint))
+
+    output = llm_chain.run(passage=passage, question=question, hint=hint)
+
+    print("output:")
+    print(output)
+
+    return "", output
+
+
+def PoT_num_eng_matching(llm, problem):
+    prompt = PromptTemplate(template=PoT_num_eng_template, input_variables=["passage", "question", "hint"])
+
+    llm_chain = LLMChain(prompt=prompt, llm=llm)
+
+    nums = re.findall(r"\d+\.\d+|\d+", problem.passage + ' ' + problem.question)
+
+    hint = ""
+    for n in nums:
+        hint += n + ' = ' + float_to_words(n) + '\n'
+
+    print("question:")
+    print(prompt.format(passage=problem.passage, question=problem.question, hint=hint))
+
+    output = llm_chain.run(passage=problem.passage, question=problem.question, hint=hint)
 
     print("output:")
     print(output)
