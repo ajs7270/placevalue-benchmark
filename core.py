@@ -773,12 +773,12 @@ def _compare_permutation(llm, sources):
     return result
 
 def make_hint(num : str):
-    result = ""
+    result = []
 
     for i in range(len(num)):
-        result += num[i] + " * 10 ^" + str(len(num) - i - 1)
+        result.append(num[i] + " * 10 ^" + str(len(num) - i - 1))
 
-    return result
+    return " + ".join(result)
 def get_hint(problem: str):
     result = ""
     nums = re.findall(r"\d+\.\d+|\d+", problem)
