@@ -776,7 +776,7 @@ def make_hint(num : str):
     result = []
 
     for i in range(len(num)):
-        result.append(num[i] + " * 10 ^" + str(len(num) - i - 1))
+        result.append(num[i] + " * 10^" + str(len(num) - i - 1))
 
     return " + ".join(result)
 def get_hint(problem: str):
