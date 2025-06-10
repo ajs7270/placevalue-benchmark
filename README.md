@@ -1,6 +1,6 @@
 # GPT Place‑Value Study
 
-This repository accompanies the AIED 2023 workshop paper **“Does ChatGPT Comprehend Place Value in Numbers When Solving Math Word Problems?”**. It contains all code, data, and cached results needed to reproduce the experiments exploring how GPT‑class models handle place‑value information in numerals.
+This repository accompanies the AIED 2023 workshop paper **“[Does ChatGPT Comprehend Place Value in Numbers When Solving Math Word Problems?](https://www.scopus.com/record/display.uri?eid=2-s2.0-85174938474&origin=inward&txGid=c56fe2a845291e125240d7e2364f33fc)”**. It contains all code, data, and cached results needed to reproduce the experiments exploring how GPT‑class models handle place‑value information in numerals.
 
 ## 📑 Paper in a Nutshell
 
